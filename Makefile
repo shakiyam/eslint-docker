@@ -1,0 +1,73 @@
+MAKEFLAGS += --no-builtin-rules
+MAKEFLAGS += --warn-undefined-variables
+SHELL := /bin/bash
+.SHELLFLAGS := -eu -o pipefail -c
+ALL_TARGETS := $(shell grep -E -o ^[0-9A-Za-z_-]+: $(MAKEFILE_LIST) | sed 's/://')
+.PHONY: $(ALL_TARGETS)
+.DEFAULT_GOAL := help
+
+all: check_for_updates format lint build trivy ## Check updates, format, lint, build, and scan image
+
+build: ## Build Docker image
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/build.sh ghcr.io/shakiyam/eslint
+
+check_for_action_updates: ## Check for GitHub Actions updates
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/check_for_action_updates.sh actions/checkout
+	@./tools/check_for_action_updates.sh docker/build-push-action
+	@./tools/check_for_action_updates.sh docker/login-action
+	@./tools/check_for_action_updates.sh docker/setup-buildx-action
+	@./tools/check_for_action_updates.sh docker/setup-qemu-action
+
+check_for_image_updates: ## Check for image updates
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/check_for_image_updates.sh "$$(awk '/^FROM /{print $$2; exit}' Dockerfile)" docker.io/library/node:slim
+
+check_for_library_updates: ## Check for library updates
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/update_lockfile.sh
+
+check_for_updates: check_for_action_updates check_for_image_updates check_for_library_updates ## Check for updates to all dependencies
+
+dockerfmt: ## Lint Dockerfile formatting
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/dockerfmt.sh -i 2 -n Dockerfile | diff -u --color=always Dockerfile -
+
+dockerfmt_format: ## Format Dockerfile
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/dockerfmt.sh -i 2 -n -w Dockerfile
+
+format: dockerfmt_format shfmt_format ## Format Dockerfile and shell scripts
+
+hadolint: ## Lint Dockerfile
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/hadolint.sh Dockerfile
+
+help: ## Print this help
+	@echo 'Usage: make [target]'
+	@echo ''
+	@echo 'Targets:'
+	@awk 'BEGIN {FS = ":.*?## "} /^[0-9A-Za-z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+lint: hadolint dockerfmt markdownlint shellcheck shfmt ## Run all linting
+
+markdownlint: ## Lint Markdown files
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/markdownlint-cli2.sh "*.md"
+
+shellcheck: ## Lint shell scripts
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/shellcheck.sh ./*.sh tools/*.sh
+
+shfmt: ## Lint shell script formatting
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/shfmt.sh -l -d -i 2 -ci -bn ./*.sh tools/*.sh
+
+shfmt_format: ## Format shell scripts
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/shfmt.sh -l -w -i 2 -ci -bn ./*.sh tools/*.sh
+
+trivy: build ## Scan Docker image for vulnerabilities
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/trivy.sh image --quiet --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 ghcr.io/shakiyam/eslint | sed -n '/^Total:/,$$p'
