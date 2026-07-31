@@ -8,5 +8,6 @@ RUN npm ci --no-audit --no-fund \
 ENV NODE_PATH=/app/node_modules
 ENV PATH=/app/node_modules/.bin:${PATH}
 WORKDIR /work
-USER nobody:nogroup
+# nobody:nogroup
+USER 65534:65534
 ENTRYPOINT ["eslint"]
