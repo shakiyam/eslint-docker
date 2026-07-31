@@ -1,4 +1,4 @@
-FROM docker.io/library/node:26.5.0-trixie-slim
+FROM docker.io/library/node:26.5.1-trixie-slim
 ARG SOURCE_COMMIT
 LABEL org.opencontainers.image.revision=$SOURCE_COMMIT
 COPY package.json package-lock.json /app/
