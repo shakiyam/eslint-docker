@@ -30,15 +30,11 @@ check_for_library_updates: ## Check for library updates
 
 check_for_updates: check_for_action_updates check_for_image_updates check_for_library_updates ## Check for updates to all dependencies
 
-dockerfmt: ## Lint Dockerfile formatting
-	@echo -e "\033[36m$@\033[0m"
-	@./tools/dockerfmt.sh -i 2 -n Dockerfile | diff -u --color=always Dockerfile -
-
-dockerfmt_format: ## Format Dockerfile
+dockerfmt: ## Format Dockerfile
 	@echo -e "\033[36m$@\033[0m"
 	@./tools/dockerfmt.sh -i 2 -n -w Dockerfile
 
-format: dockerfmt_format shfmt_format ## Format Dockerfile and shell scripts
+format: dockerfmt shfmt ## Run all formatting
 
 hadolint: ## Lint Dockerfile
 	@echo -e "\033[36m$@\033[0m"
@@ -50,7 +46,7 @@ help: ## Print this help
 	@echo 'Targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[0-9A-Za-z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-lint: hadolint dockerfmt markdownlint shellcheck shfmt ## Run all linting
+lint: hadolint markdownlint shellcheck ## Run all linting
 
 markdownlint: ## Lint Markdown files
 	@echo -e "\033[36m$@\033[0m"
@@ -60,11 +56,7 @@ shellcheck: ## Lint shell scripts
 	@echo -e "\033[36m$@\033[0m"
 	@./tools/shellcheck.sh ./*.sh tools/*.sh
 
-shfmt: ## Lint shell script formatting
-	@echo -e "\033[36m$@\033[0m"
-	@./tools/shfmt.sh -l -d -i 2 -ci -bn ./*.sh tools/*.sh
-
-shfmt_format: ## Format shell scripts
+shfmt: ## Format shell scripts
 	@echo -e "\033[36m$@\033[0m"
 	@./tools/shfmt.sh -l -w -i 2 -ci -bn ./*.sh tools/*.sh
 
