@@ -38,7 +38,7 @@ dockerfmt: ## Format Dockerfile
 	@echo -e "\033[36m$@\033[0m"
 	@./tools/dockerfmt.sh -i 2 -n -w Dockerfile
 
-format: dockerfmt shfmt ## Run all formatting
+format: dockerfmt shfmt yamlfmt ## Run all formatting
 
 hadolint: ## Lint Dockerfile
 	@echo -e "\033[36m$@\033[0m"
@@ -67,6 +67,10 @@ shfmt: ## Format shell scripts
 trivy: build ## Scan Docker image for vulnerabilities
 	@echo -e "\033[36m$@\033[0m"
 	@./tools/trivy.sh image --quiet --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 ghcr.io/shakiyam/eslint | sed -n '/^Total:/,$$p'
+
+yamlfmt: ## Format YAML files
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/yamlfmt.sh .github/zizmor.yml .github/workflows/*.yml
 
 zizmor: ## Lint GitHub Actions workflows for security issues
 	@echo -e "\033[36m$@\033[0m"
