@@ -8,6 +8,10 @@ ALL_TARGETS := $(shell grep -E -o ^[0-9A-Za-z_-]+: $(MAKEFILE_LIST) | sed 's/://
 
 all: check_for_updates format lint build trivy ## Check updates, format, lint, build, and scan image
 
+actionlint: ## Lint GitHub Actions workflow files
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/actionlint.sh
+
 build: ## Build Docker image
 	@echo -e "\033[36m$@\033[0m"
 	@./tools/build.sh ghcr.io/shakiyam/eslint
@@ -46,7 +50,7 @@ help: ## Print this help
 	@echo 'Targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[0-9A-Za-z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-lint: hadolint markdownlint shellcheck ## Run all linting
+lint: actionlint hadolint markdownlint shellcheck zizmor ## Run all linting
 
 markdownlint: ## Lint Markdown files
 	@echo -e "\033[36m$@\033[0m"
@@ -63,3 +67,7 @@ shfmt: ## Format shell scripts
 trivy: build ## Scan Docker image for vulnerabilities
 	@echo -e "\033[36m$@\033[0m"
 	@./tools/trivy.sh image --quiet --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 ghcr.io/shakiyam/eslint | sed -n '/^Total:/,$$p'
+
+zizmor: ## Lint GitHub Actions workflows for security issues
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/zizmor.sh .
