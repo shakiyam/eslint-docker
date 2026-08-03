@@ -32,7 +32,11 @@ check_for_library_updates: ## Check for library updates
 	@echo -e "\033[36m$@\033[0m"
 	@./tools/update_lockfile.sh
 
-check_for_updates: check_for_action_updates check_for_image_updates check_for_library_updates ## Check for updates to all dependencies
+check_for_new_release: ## Check for new release
+	@echo -e "\033[36m$@\033[0m"
+	@./tools/check_for_new_release.sh eslint/eslint "v$$(awk -F'"' '/"node_modules\/eslint":/{f=1} f&&/"version":/{print $$4; exit}' package-lock.json)" 'v[0-9]+'
+
+check_for_updates: check_for_action_updates check_for_image_updates check_for_library_updates check_for_new_release ## Check for updates to all dependencies
 
 dockerfmt: ## Format Dockerfile
 	@echo -e "\033[36m$@\033[0m"

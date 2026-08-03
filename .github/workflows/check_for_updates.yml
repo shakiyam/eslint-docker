@@ -44,3 +44,13 @@ jobs:
         run: make check_for_library_updates
       - name: Run check_for_file_updates.sh
         run: ./tools/check_for_file_updates.sh package-lock.json
+  check_for_new_release:
+    name: Check for new release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Run make check_for_new_release
+        run: make check_for_new_release
