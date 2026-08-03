@@ -1,11 +1,6 @@
 #!/bin/bash
 set -Eeu -o pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-readonly SCRIPT_DIR
-# shellcheck disable=SC1091
-. "$SCRIPT_DIR"/tools/colored_echo.sh
-
 if command -v docker &>/dev/null; then
   docker container run \
     --name "eslint_$(uuidgen | head -c8)" \
@@ -23,6 +18,10 @@ elif command -v podman &>/dev/null; then
     -v "$PWD":/work:ro \
     ghcr.io/shakiyam/eslint "$@"
 else
-  echo_error 'Neither docker nor podman is installed.'
+  if [[ -t 2 ]]; then
+    echo -e "\033[1;31mNeither docker nor podman is installed.\033[0m" >&2 # Bold Red
+  else
+    echo 'Neither docker nor podman is installed.' >&2
+  fi
   exit 1
 fi
