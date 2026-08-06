@@ -1,4 +1,4 @@
-FROM docker.io/library/node:26.5.1-trixie-slim
+FROM docker.io/library/node:26.7.0-trixie-slim
 COPY package.json package-lock.json /app/
 WORKDIR /app
 RUN npm ci --no-audit --no-fund \
