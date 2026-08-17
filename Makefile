@@ -6,7 +6,7 @@ ALL_TARGETS := $(shell grep -E -o ^[0-9A-Za-z_-]+: $(MAKEFILE_LIST) | sed 's/://
 .PHONY: $(ALL_TARGETS)
 .DEFAULT_GOAL := help
 
-all: check_for_updates format lint build trivy ## Check updates, format, lint, build, and scan image
+all: check_for_updates format lint build trivy test ## Check updates, format, lint, build, scan image, and test
 
 actionlint: ## Lint GitHub Actions workflow files
 	@echo -e "\033[36m$@\033[0m"
@@ -38,6 +38,9 @@ check_for_new_release: ## Check for new release
 
 check_for_updates: check_for_action_updates check_for_image_updates check_for_library_updates check_for_new_release ## Check for updates to all dependencies
 
+check_local_image:
+	@./tools/check_local_image.sh ghcr.io/shakiyam/eslint
+
 dockerfmt: ## Format Dockerfile
 	@echo -e "\033[36m$@\033[0m"
 	@./tools/dockerfmt.sh -i 2 -n -w Dockerfile
@@ -67,6 +70,10 @@ shellcheck: ## Lint shell scripts
 shfmt: ## Format shell scripts
 	@echo -e "\033[36m$@\033[0m"
 	@./tools/shfmt.sh -l -w -i 2 -ci -bn ./*.sh tools/*.sh
+
+test: check_local_image ## Test Docker image
+	@echo -e "\033[36m$@\033[0m"
+	@./test_eslint.sh
 
 trivy: build ## Scan Docker image for vulnerabilities
 	@echo -e "\033[36m$@\033[0m"
