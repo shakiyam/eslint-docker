@@ -52,6 +52,7 @@ jobs:
           load: true
           no-cache: true
           tags: ghcr.io/shakiyam/eslint:latest
+          cache-to: type=gha,scope=ci-${{ github.run_id }},mode=max
       - name: Run make test
         run: make test
   trivy:
@@ -98,6 +99,7 @@ jobs:
           build-args: SOURCE_COMMIT=${{ github.sha }}
           platforms: linux/amd64, linux/arm64
           push: true
+          cache-from: type=gha,scope=ci-${{ github.run_id }}
           tags: |
             docker.io/shakiyam/eslint:latest
             ghcr.io/shakiyam/eslint:latest
