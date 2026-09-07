@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "eslint": "10.*",
-    "@eslint/js": "10.*"
+    "@eslint/js": "10.*",
+    "eslint": "10.10.0"
   }
 }

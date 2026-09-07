@@ -34,7 +34,7 @@ check_for_library_updates: ## Check for library updates
 
 check_for_new_release: ## Check for new release
 	@echo -e "\033[36m$@\033[0m"
-	@./tools/check_for_new_release.sh eslint/eslint "v$$(awk -F'"' '/"node_modules\/eslint":/{f=1} f&&/"version":/{print $$4; exit}' package-lock.json)" 'v[0-9]+'
+	@./tools/check_for_new_release.sh eslint/eslint "v$$(awk -F'"' '/"eslint":/{print $$4; exit}' package.json)"
 
 check_for_updates: check_for_action_updates check_for_image_updates check_for_library_updates check_for_new_release ## Check for updates to all dependencies
 
