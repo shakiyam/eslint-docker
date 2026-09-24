@@ -8,7 +8,7 @@ readonly SCRIPT_DIR
 # shellcheck disable=SC1091
 . "$SCRIPT_DIR"/container_engine.sh
 
-readonly NODE_IMAGE="docker.io/library/node:26.8.2-trixie-slim"
+readonly NODE_IMAGE="docker.io/library/node:26.10.0-trixie-slim"
 
 CONTAINER_ENGINE=$(detect_container_engine)
 readonly CONTAINER_ENGINE
