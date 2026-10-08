@@ -21,7 +21,7 @@ readonly ENGINE_OPTS
 
 [[ -e package-lock.json ]] || echo '{}' >package-lock.json
 $CONTAINER_ENGINE container run \
-  --name "update_lockfile_$(uuidgen | head -c8)" \
+  --name "update_package_lock_$(uuidgen | head -c8)" \
   --rm \
   "${ENGINE_OPTS[@]}" \
   -v "$PWD/package.json":/work/package.json:ro \
