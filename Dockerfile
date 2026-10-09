@@ -1,4 +1,4 @@
-FROM docker.io/library/node:26.10.0-trixie-slim
+FROM docker.io/library/node:26.11.1-trixie-slim
 # TODO: Remove package upgrades once base image includes libpcre2-8-0 >= 10.46-1~deb13u3 (CVE-2026-103111),
 # and libssl3t64 and openssl-provider-legacy >= 3.5.7-1~deb13u3 (CVE-2026-75804, CVE-2026-84782)
 # hadolint ignore=DL3008
