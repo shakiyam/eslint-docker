@@ -7,7 +7,7 @@ How to Use
 ----------
 
 ```console
-docker container run --rm -v "$PWD":/work:ro ghcr.io/shakiyam/eslint .
+docker container run --rm -u "$(id -u):$(id -g)" -v "$PWD":/work:ro ghcr.io/shakiyam/eslint .
 ```
 
 `@eslint/js` is installed in the image and resolvable from your `eslint.config.js`:
